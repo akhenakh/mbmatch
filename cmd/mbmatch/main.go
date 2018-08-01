@@ -7,11 +7,12 @@ import (
 	"net/http"
 
 	"github.com/akhenakh/mbmatch/mbtiles"
+	"github.com/gobuffalo/packr"
 )
 
 var (
 	path  = flag.String("path", "", "mbtiles file path")
-	port  = flag.Int("port", 6000, "port to listen for HTTP")
+	port  = flag.Int("port", 7000, "port to listen for HTTP")
 	debug = flag.Bool("debug", false, "enable debug")
 )
 
@@ -20,6 +21,7 @@ func main() {
 
 	if *path == "" {
 		flag.Usage()
+		return
 	}
 
 	db, err := mbtiles.NewDB(*path)
@@ -28,6 +30,9 @@ func main() {
 	}
 	db.Debug = *debug
 
+	box := packr.NewBox("./htdocs")
+
 	http.HandleFunc("/tiles/", db.ServeHTTP)
+	http.Handle("/", http.FileServer(box))
 	log.Fatal(http.ListenAndServe(fmt.Sprintf(":%d", *port), nil))
 }
