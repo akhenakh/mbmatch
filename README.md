@@ -19,6 +19,24 @@ Open your browser at http://localhost:7000
 
 It's mainly use for an [offline car map project](https://blog.nobugware.com/post/2018/my_own_car_system_raspberry_pi_offline_mapping/)
 
+## Autostart`
+Edit `/etc/systemd/system/mbmatch.service`
+
+```
+[Unit]
+Description=mbmatch
+
+[Service]
+WorkingDirectory=/home/youruser
+ExecStart=/home/youruser/mbmatch -path /home/youruser/north-america.mbtiles 
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target
+```
+`systemctl enable mbmatch`
+
 ## License 
 
 Code is licensed under MIT.
