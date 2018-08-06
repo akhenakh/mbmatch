@@ -16,6 +16,13 @@ var (
 	debug = flag.Bool("debug", false, "enable debug")
 )
 
+func addAllowOrigin(h http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Access-Control-Allow-Origin", "*")
+		h.ServeHTTP(w, r)
+	})
+}
+
 func main() {
 	flag.Parse()
 
@@ -33,6 +40,6 @@ func main() {
 	box := packr.NewBox("./htdocs")
 
 	http.HandleFunc("/tiles/", db.ServeHTTP)
-	http.Handle("/", http.FileServer(box))
+	http.Handle("/", addAllowOrigin(http.FileServer(box)))
 	log.Fatal(http.ListenAndServe(fmt.Sprintf(":%d", *port), nil))
 }

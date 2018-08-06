@@ -43,6 +43,8 @@ func (db *DB) ReadTile(z uint8, x uint64, y uint64) ([]byte, error) {
 
 // ServeHTTP serve the mbtiles at /tiles/11/618/722.pbf
 func (db *DB) ServeHTTP(w http.ResponseWriter, req *http.Request) {
+	w.Header().Set("Access-Control-Allow-Origin", "*")
+
 	s := strings.Split(req.URL.Path, "/")
 
 	if len(s) != 5 {
