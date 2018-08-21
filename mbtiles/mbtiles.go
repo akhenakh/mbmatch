@@ -30,8 +30,8 @@ func NewDB(path string) (*DB, error) {
 	return &DB{DB: db}, nil
 }
 
-// ReadTile read a tile returns empty []byte if not existing
-func (db *DB) ReadTile(z uint8, x uint64, y uint64) ([]byte, error) {
+// ReadTileData returns []bytes from a tile
+func (db *DB) ReadTileData(z uint8, x uint64, y uint64) ([]byte, error) {
 	var data []byte
 	err := db.QueryRow("select tile_data from tiles where zoom_level = ? and tile_column = ? and tile_row = ?", z, x, y).Scan(&data)
 
@@ -45,8 +45,8 @@ func (db *DB) ReadTile(z uint8, x uint64, y uint64) ([]byte, error) {
 	return data, nil
 }
 
-// DecodeTileData takes gzipped pbf data decode and returns a Tile
-func DecodeTileData(b []byte) (*Tile, error) {
+// TileFromData takes gzipped pbf data decode and returns a Tile
+func TileFromData(b []byte) (*Tile, error) {
 	r := bytes.NewBuffer(b)
 	fz, err := gzip.NewReader(r)
 	if err != nil {
@@ -77,7 +77,7 @@ func (db *DB) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 	x, _ := strconv.Atoi(s[3])
 	y, _ := strconv.Atoi(strings.Trim(s[4], ".pbf"))
 
-	data, err := db.ReadTile(uint8(z), uint64(x), uint64(1<<uint(z)-y-1))
+	data, err := db.ReadTileData(uint8(z), uint64(x), uint64(1<<uint(z)-y-1))
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return

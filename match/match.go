@@ -39,13 +39,13 @@ func (e *Engine) MapMatch(lat, lng, heading float64, hint string) (*MatchedPosit
 		return nil, err
 	}
 
-	t, err := mbtiles.DecodeTileData(d)
+	t, err := mbtiles.TileFromData(d)
 	if err != nil {
 		return nil, err
 	}
 
 	for _, l := range t.Layers {
-		if l.Name != "transportation_name" {
+		if l.Name != "transportation" {
 			continue
 		}
 
