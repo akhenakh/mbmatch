@@ -1,12 +1,16 @@
 package mbtiles
 
 import (
+	"bytes"
+	"compress/gzip"
 	"database/sql"
+	"io/ioutil"
 	"net/http"
 	"strconv"
 	"strings"
 
 	// sqlite3 because mbtiles is sqlite3 only
+	"github.com/gogo/protobuf/proto"
 	_ "github.com/mattn/go-sqlite3"
 )
 
@@ -39,6 +43,24 @@ func (db *DB) ReadTile(z uint8, x uint64, y uint64) ([]byte, error) {
 	}
 
 	return data, nil
+}
+
+// DecodeTileData takes gzipped pbf data decode and returns a Tile
+func DecodeTileData(b []byte) (*Tile, error) {
+	r := bytes.NewBuffer(b)
+	fz, err := gzip.NewReader(r)
+	if err != nil {
+		return nil, err
+	}
+	defer fz.Close()
+
+	data, err := ioutil.ReadAll(fz)
+	if err != nil {
+		return nil, err
+	}
+	t := &Tile{}
+	err = proto.Unmarshal(data, t)
+	return t, err
 }
 
 // ServeHTTP serve the mbtiles at /tiles/11/618/722.pbf

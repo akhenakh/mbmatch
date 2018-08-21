@@ -1,0 +1,42 @@
+syntax = "proto3";
+
+package mbtiles;
+
+message Tile {
+
+        enum GeomType {
+             UNKNOWN = 0;
+             POINT = 1;
+             LINESTRING = 2;
+             POLYGON = 3;
+        }
+
+        message Value {
+                string string_value = 1;
+                float float_value = 2;
+                double double_value = 3;
+                int64 int_value = 4;
+                uint64 uint_value = 5;
+                sint64 sint_value = 6;
+                bool bool_value = 7;
+        }
+
+        message Feature {
+                uint64 id = 1;
+                repeated uint32 tags = 2 [ packed = true ];
+                GeomType type = 3;
+                repeated uint32 geometry = 4 [ packed = true ];
+        }
+
+        message Layer {
+                uint32 version = 15;
+
+                string name = 1;
+                repeated Feature features = 2;
+                repeated string keys = 3;
+                repeated Value values = 4;
+                uint32 extent = 5;
+        }
+
+        repeated Layer layers = 3;
+}
