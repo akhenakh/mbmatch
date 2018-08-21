@@ -23,14 +23,13 @@ message Tile {
 
         message Feature {
                 uint64 id = 1;
-                repeated uint32 tags = 2 [ packed = true ];
+                repeated uint32 tags = 2;
                 GeomType type = 3;
-                repeated uint32 geometry = 4 [ packed = true ];
+                repeated uint32 geometry = 4;
         }
 
         message Layer {
                 uint32 version = 15;
-
                 string name = 1;
                 repeated Feature features = 2;
                 repeated string keys = 3;
