@@ -34,7 +34,6 @@ func NewDB(path string) (*DB, error) {
 func (db *DB) ReadTileData(z uint8, x uint64, y uint64) ([]byte, error) {
 	var data []byte
 	err := db.QueryRow("select tile_data from tiles where zoom_level = ? and tile_column = ? and tile_row = ?", z, x, y).Scan(&data)
-
 	if err == sql.ErrNoRows {
 		return nil, nil
 	}
@@ -65,7 +64,9 @@ func TileFromData(b []byte) (*Tile, error) {
 
 // ServeHTTP serve the mbtiles at /tiles/11/618/722.pbf
 func (db *DB) ServeHTTP(w http.ResponseWriter, req *http.Request) {
-	w.Header().Set("Access-Control-Allow-Origin", "*")
+	if w.Header().Get("Access-Control-Allow-Origin") == "" {
+		w.Header().Set("Access-Control-Allow-Origin", "*")
+	}
 
 	s := strings.Split(req.URL.Path, "/")
 
