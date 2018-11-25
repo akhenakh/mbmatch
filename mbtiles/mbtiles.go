@@ -10,7 +10,7 @@ import (
 	"strings"
 
 	// sqlite3 because mbtiles is sqlite3 only
-	"github.com/gogo/protobuf/proto"
+	"github.com/golang/protobuf/proto"
 	_ "github.com/mattn/go-sqlite3"
 )
 
