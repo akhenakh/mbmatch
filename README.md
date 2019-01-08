@@ -19,6 +19,15 @@ Open your browser at http://localhost:7000
 
 It's mainly use for an [offline car map project](https://blog.nobugware.com/post/2018/my_own_car_system_raspberry_pi_offline_mapping/)
 
+## Installation
+
+You need the Go compiler installed and set a GOPATH env variable.
+
+```
+go get github.com/akhenakh/mbmatch/cmd/mbmatch
+${GOPATH}/bin/mbmatch -path mymap.mbtiles
+```
+
 ## Autostart`
 Edit `/etc/systemd/system/mbmatch.service`
 
