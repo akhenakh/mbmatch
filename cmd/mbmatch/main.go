@@ -1,7 +1,6 @@
 package main
 
 import (
-	"flag"
 	"fmt"
 	"log"
 	"net/http"
@@ -10,14 +9,15 @@ import (
 
 	"github.com/gobuffalo/packr"
 	"github.com/gorilla/handlers"
+	"github.com/namsral/flag"
 
 	"github.com/akhenakh/mbmatch/mbtiles"
 )
 
 var (
-	tilesPath  = flag.String("tilesPath", "", "mbtiles file path")
-	port  = flag.Int("port", 7000, "port to listen for HTTP")
-	hostname = flag.String("hostname", fmt.Sprintf("localhost:%d", *port), "the hostname to come back at tiles")
+	tilesPath  = flag.String("tilesPath", "./hawaii.mbtiles", "mbtiles file path")
+	port  = flag.Int("port", 8000, "port to listen for HTTP")
+	hostname = flag.String("hostname", fmt.Sprintf("127.0.0.1:%d", *port), "the hostname to come back at tiles")
 	debug = flag.Bool("debug", false, "enable debug")
 	enforceReferrer = flag.Bool("enforceReferrer", false, "enforce referrer check using hostname")
 
@@ -32,6 +32,7 @@ type server struct {
 func addAllowOrigin(h http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Access-Control-Allow-Origin", "*")
+		w.Header().Set("Access-Control-Allow-Methods", "GET")
 		h.ServeHTTP(w, r)
 	})
 }
@@ -74,7 +75,9 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	db.HostnameReferrer = *hostname
+	if *enforceReferrer {
+		db.HostnameReferrer = *hostname
+	}
 	db.Debug = *debug
 
 	box := packr.NewBox("./htdocs")

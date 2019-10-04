@@ -5,6 +5,11 @@ An MBTiles server for PBF.
 
 Pass it an openmaptiles mbtiles file datasource, it can serve the map without an internet connection.
 
+Pass environment:
+
+`HOSTNAME` `TILESPATH` `PORT`
+
+or command flags:
 ```
 Usage of ./mbmatch:
   -debug
@@ -19,7 +24,7 @@ Usage of ./mbmatch:
 
 Open your browser at http://localhost:7000
 
-It's mainly use for an [offline car map project](https://blog.nobugware.com/post/2018/my_own_car_system_raspberry_pi_offline_mapping/)
+It's mainly use for an [offline car map project](https://blog.nobugware.com/post/2018/my_own_car_system_raspberry_pi_offline_mapping/) but can also serve tiles on the web.
 
 ## Installation
 
@@ -28,6 +33,12 @@ You need the Go compiler installed and set a GOPATH env variable.
 ```
 go get github.com/akhenakh/mbmatch/cmd/mbmatch
 ${GOPATH}/bin/mbmatch -path mymap.mbtiles -hostname myserver:8000
+```
+
+or use [a docker image](https://cloud.docker.com/repository/docker/akhenakh/mbmatch).
+
+```
+docker run -it --rm -p 8000:8000 -e HOSTNAME=mymap.server.com -e TILESPATH=/root/hawaii.mbtiles akhenakh/mbmatch:latest  
 ```
 
 ## Autostart
@@ -39,7 +50,7 @@ Description=mbmatch
 
 [Service]
 WorkingDirectory=/home/youruser
-ExecStart=/home/youruser/mbmatch -path /home/youruser/north-america.mbtiles 
+ExecStart=/home/youruser/mbmatch -tilesPath /home/youruser/north-america.mbtiles 
 Restart=always
 RestartSec=5
 

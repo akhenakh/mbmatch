@@ -6,6 +6,7 @@ import (
 	"database/sql"
 	"io/ioutil"
 	"net/http"
+	"os"
 	"strconv"
 	"strings"
 
@@ -24,6 +25,12 @@ type DB struct {
 
 // NewDB open an MBTile for reading
 func NewDB(path string) (*DB, error) {
+	if _, err := os.Stat(path); err != nil {
+		if os.IsNotExist(err) {
+			return nil, err
+		}
+	}
+
 	db, err := sql.Open("sqlite3", path+"?mode=ro")
 	if err != nil {
 		return nil, err
@@ -73,6 +80,7 @@ func (db *DB) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 	}
 	if w.Header().Get("Access-Control-Allow-Origin") == "" {
 		w.Header().Set("Access-Control-Allow-Origin", "*")
+		w.Header().Set("Access-Control-Allow-Methods", "GET")
 	}
 
 	s := strings.Split(req.URL.Path, "/")
