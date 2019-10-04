@@ -18,6 +18,8 @@ import (
 type DB struct {
 	*sql.DB
 	Debug bool
+	// HostnameReferrer != "" it will be checked against
+	HostnameReferrer string
 }
 
 // NewDB open an MBTile for reading
@@ -64,6 +66,11 @@ func TileFromData(b []byte) (*Tile, error) {
 
 // ServeHTTP serve the mbtiles at /tiles/11/618/722.pbf
 func (db *DB) ServeHTTP(w http.ResponseWriter, req *http.Request) {
+	if db.HostnameReferrer != "" &&
+		strings.HasPrefix(req.Referer(), "http://" + db.HostnameReferrer) {
+		http.Error(w, http.StatusText(http.StatusUnauthorized), http.StatusUnauthorized)
+		return
+	}
 	if w.Header().Get("Access-Control-Allow-Origin") == "" {
 		w.Header().Set("Access-Control-Allow-Origin", "*")
 	}

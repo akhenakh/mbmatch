@@ -1,7 +1,7 @@
 mbmatch
 =======
 
-An MBTiles server for PBF, which is also a map matcher.
+An MBTiles server for PBF.
 
 Pass it an openmaptiles mbtiles file datasource, it can serve the map without an internet connection.
 
@@ -9,10 +9,12 @@ Pass it an openmaptiles mbtiles file datasource, it can serve the map without an
 Usage of ./mbmatch:
   -debug
         enable debug
-  -path string
-        mbtiles file path
+  -hostname string
+        the hostname to come back at tiles (default "localhost:7000")
   -port int
         port to listen for HTTP (default 7000)
+  -tilesPath string
+        mbtiles file path
 ```
 
 Open your browser at http://localhost:7000
@@ -25,10 +27,10 @@ You need the Go compiler installed and set a GOPATH env variable.
 
 ```
 go get github.com/akhenakh/mbmatch/cmd/mbmatch
-${GOPATH}/bin/mbmatch -path mymap.mbtiles
+${GOPATH}/bin/mbmatch -path mymap.mbtiles -hostname myserver:8000
 ```
 
-## Autostart`
+## Autostart
 Edit `/etc/systemd/system/mbmatch.service`
 
 ```

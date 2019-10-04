@@ -54,6 +54,13 @@ func (e *Engine) MapMatch(lat, lng, heading float64, hint string) (*MatchedPosit
 				continue
 			}
 
+			switch on class
+			motorway
+trunk
+primary
+secondary
+tertiary
+
 			log.Println(l.Keys, l.Values, f.Tags, f.Id)
 		}
 	}

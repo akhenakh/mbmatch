@@ -5,16 +5,29 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"strings"
+	"text/template"
+
+	"github.com/gobuffalo/packr"
+	"github.com/gorilla/handlers"
 
 	"github.com/akhenakh/mbmatch/mbtiles"
-	"github.com/gobuffalo/packr"
 )
 
 var (
-	path  = flag.String("path", "", "mbtiles file path")
+	tilesPath  = flag.String("tilesPath", "", "mbtiles file path")
 	port  = flag.Int("port", 7000, "port to listen for HTTP")
+	hostname = flag.String("hostname", fmt.Sprintf("localhost:%d", *port), "the hostname to come back at tiles")
 	debug = flag.Bool("debug", false, "enable debug")
+	enforceReferrer = flag.Bool("enforceReferrer", false, "enforce referrer check using hostname")
+
+	pathTpl = []string{"osm-liberty-gl.style", "solarized-dark.style", "planet.json"}
 )
+
+type server struct {
+	box *packr.Box
+	fileHandler http.Handler
+}
 
 func addAllowOrigin(h http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -23,23 +36,63 @@ func addAllowOrigin(h http.Handler) http.Handler {
 	})
 }
 
+func (s *server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	path := strings.TrimPrefix(r.URL.Path, "/")
+
+	// serve file normally
+	if !isTpl(path) {
+		s.fileHandler.ServeHTTP(w, r)
+		return
+	}
+
+	sf, err := s.box.FindString(path)
+	if err != nil {
+		http.Error(w, err.Error(), 500)
+		log.Fatal(err)
+	}
+
+	p := map[string]interface{}{"Hostname": *hostname}
+
+	tmplt := template.New("tpl")
+	tmplt, err = tmplt.Parse(sf)
+	if err != nil {
+		http.Error(w, err.Error(), 500)
+		log.Fatal(err)
+	}
+	tmplt.Execute(w, p)
+}
+
 func main() {
 	flag.Parse()
 
-	if *path == "" {
+	if *tilesPath == "" {
 		flag.Usage()
 		return
 	}
 
-	db, err := mbtiles.NewDB(*path)
+	db, err := mbtiles.NewDB(*tilesPath)
 	if err != nil {
 		log.Fatal(err)
 	}
+	db.HostnameReferrer = *hostname
 	db.Debug = *debug
 
 	box := packr.NewBox("./htdocs")
 
+	s := &server{
+		box: &box,
+		fileHandler: http.FileServer(box),
+	}
 	http.HandleFunc("/tiles/", db.ServeHTTP)
-	http.Handle("/", addAllowOrigin(http.FileServer(box)))
+	http.Handle("/",  handlers.CompressHandler(addAllowOrigin(s)))
 	log.Fatal(http.ListenAndServe(fmt.Sprintf(":%d", *port), nil))
+}
+
+func isTpl(path string) bool {
+	for _, p := range pathTpl {
+		if p == path {
+			return true
+		}
+	}
+	return false
 }

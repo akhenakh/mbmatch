@@ -8,11 +8,11 @@
   "sources": {
     "openmaptiles": {
       "type": "vector",
-      "url": "http://localhost:7000/north-america.json"
+      "url": "http://{{ .Hostname }}/planet.json"
     }
   },
-  "sprite": "http://localhost:7000/osm-liberty",
-  "glyphs": "http://localhost:7000/glyphs/{fontstack}/{range}.pbf",
+  "sprite": "http://{{ .Hostname }}/osm-liberty",
+  "glyphs": "http://{{ .Hostname }}/glyphs/{fontstack}/{range}.pbf",
   "layers": [
     {
       "id": "background",
