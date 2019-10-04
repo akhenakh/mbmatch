@@ -32,10 +32,10 @@ You need the Go compiler installed and set a GOPATH env variable.
 
 ```
 go get github.com/akhenakh/mbmatch/cmd/mbmatch
-${GOPATH}/bin/mbmatch -path mymap.mbtiles -hostname myserver:8000
+${GOPATH}/bin/mbmatch -tilesPath hawaii.mbtiles -hostname myserver:8000
 ```
 
-or use [a docker image](https://cloud.docker.com/repository/docker/akhenakh/mbmatch).
+or use [a docker image](https://hub.docker.com/r/akhenakh/mbmatch).
 
 ```
 docker run -it --rm -p 8000:8000 -e HOSTNAME=mymap.server.com -e TILESPATH=/root/hawaii.mbtiles akhenakh/mbmatch:latest  
