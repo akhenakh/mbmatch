@@ -37,7 +37,7 @@ ${GOPATH}/bin/mbmatch -tilesPath hawaii.mbtiles -hostname myserver:8000
 
 You can embed the files in the binary using [packr](http://github.com/gobuffalo/packr)
 ```
-go get github.com/gobuffalo/packr
+go get -u github.com/gobuffalo/packr/packr
 packr build
 ```
 
