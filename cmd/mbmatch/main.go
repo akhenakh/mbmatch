@@ -38,7 +38,7 @@ func addAllowOrigin(h http.Handler) http.Handler {
 }
 func enforceReferrerHandler(h http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		if *hostname != "" && strings.HasPrefix(r.Referer(), "http://"+*hostname) {
+		if *enforceReferrer && strings.HasPrefix(r.Referer(), "http://"+*hostname) {
 			http.Error(w, http.StatusText(http.StatusUnauthorized), http.StatusUnauthorized)
 			return
 		}
