@@ -15,17 +15,17 @@ import (
 )
 
 var (
-	tilesPath  = flag.String("tilesPath", "./hawaii.mbtiles", "mbtiles file path")
-	port  = flag.Int("port", 8000, "port to listen for HTTP")
-	hostname = flag.String("hostname", fmt.Sprintf("127.0.0.1:%d", *port), "the hostname to come back at tiles")
-	debug = flag.Bool("debug", false, "enable debug")
+	tilesPath       = flag.String("tilesPath", "./hawaii.mbtiles", "mbtiles file path")
+	port            = flag.Int("port", 8000, "port to listen for HTTP")
+	hostname        = flag.String("hostname", fmt.Sprintf("127.0.0.1:%d", *port), "the hostname to come back at tiles")
+	debug           = flag.Bool("debug", false, "enable debug")
 	enforceReferrer = flag.Bool("enforceReferrer", false, "enforce referrer check using hostname")
 
 	pathTpl = []string{"osm-liberty-gl.style", "solarized-dark.style", "planet.json"}
 )
 
 type server struct {
-	box *packr.Box
+	box         *packr.Box
 	fileHandler http.Handler
 }
 
@@ -33,6 +33,15 @@ func addAllowOrigin(h http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Access-Control-Allow-Origin", "*")
 		w.Header().Set("Access-Control-Allow-Methods", "GET")
+		h.ServeHTTP(w, r)
+	})
+}
+func enforceReferrerHandler(h http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if *hostname != "" && strings.HasPrefix(r.Referer(), "http://"+*hostname) {
+			http.Error(w, http.StatusText(http.StatusUnauthorized), http.StatusUnauthorized)
+			return
+		}
 		h.ServeHTTP(w, r)
 	})
 }
@@ -75,19 +84,16 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	if *enforceReferrer {
-		db.HostnameReferrer = *hostname
-	}
 	db.Debug = *debug
 
 	box := packr.NewBox("./htdocs")
 
 	s := &server{
-		box: &box,
+		box:         &box,
 		fileHandler: http.FileServer(box),
 	}
-	http.HandleFunc("/tiles/", db.ServeHTTP)
-	http.Handle("/",  handlers.CompressHandler(addAllowOrigin(s)))
+	http.Handle("/tiles/", addAllowOrigin(enforceReferrerHandler(db)))
+	http.Handle("/", handlers.CompressHandler(addAllowOrigin(s)))
 	log.Fatal(http.ListenAndServe(fmt.Sprintf(":%d", *port), nil))
 }
 
