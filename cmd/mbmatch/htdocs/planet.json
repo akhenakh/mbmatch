@@ -21,7 +21,7 @@
   "filesize": "65155072",
   "format": "pbf",
   "id": "planet",
-  "map": "http://{{ .Hostname }}/map",
+  "map": "{{ .TilesURL }}/map",
   "maxzoom": 11,
   "minzoom": 0,
   "mtime": "1519996174985",
@@ -30,7 +30,7 @@
   "scheme": "xyz",
   "tilejson": "2.1.0",
   "tiles": [
-    "http://{{ .Hostname }}/tiles/{z}/{x}/{y}.pbf"
+    "{{ .TilesURL }}/tiles/{z}/{x}/{y}.pbf"
   ],
   "type": "baselayer",
   "vector_layers": [

@@ -12,14 +12,11 @@ Pass environment:
 or command flags:
 ```
 Usage of ./mbmatch:
-  -debug
-        enable debug
-  -hostname string
-        the hostname to come back at tiles (default "localhost:7000")
-  -port int
-        port to listen for HTTP (default 7000)
-  -tilesPath string
-        mbtiles file path
+  -debug=false: enable debug
+  -enforceReferrer=false: enforce referrer check using tilesURL
+  -port=8000: port to listen for HTTP
+  -tilesPath="./hawaii.mbtiles": mbtiles file path
+  -tilesURL="http://127.0.0.1:8000": the URL to come back at tiles
 ```
 
 Open your browser at http://localhost:7000
@@ -32,7 +29,7 @@ You need the Go compiler installed and set a GOPATH env variable.
 
 ```
 go get github.com/akhenakh/mbmatch/cmd/mbmatch
-${GOPATH}/bin/mbmatch -tilesPath hawaii.mbtiles -hostname myserver:8000
+${GOPATH}/bin/mbmatch -tilesPath hawaii.mbtiles -tilesURL http://myserver:8000
 ```
 
 You can embed the files in the binary using [packr](http://github.com/gobuffalo/packr)
@@ -44,7 +41,7 @@ packr build
 or use [a docker image](https://hub.docker.com/r/akhenakh/mbmatch).
 
 ```
-docker run -it --rm -p 8000:8000 -e HOSTNAME=mymap.server.com -e TILESPATH=/root/hawaii.mbtiles akhenakh/mbmatch:latest  
+docker run -it --rm -p 8000:8000 -e TILESURL=http://mymap.server.com:8000 -e TILESPATH=/root/hawaii.mbtiles akhenakh/mbmatch:latest  
 ```
 
 ## Autostart

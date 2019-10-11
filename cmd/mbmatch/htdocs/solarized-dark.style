@@ -8,11 +8,11 @@
   "sources": {
     "openmaptiles": {
       "type": "vector",
-      "url": "http://{{ .Hostname }}/planet.json"
+      "url": "{{ .TilesURL }}/planet.json"
     }
   },
-  "sprite": "http://{{ .Hostname }}/osm-liberty",
-  "glyphs": "http://{{ .Hostname }}/glyphs/{fontstack}/{range}.pbf",
+  "sprite": "{{ .TilesURL }}/osm-liberty",
+  "glyphs": "{{ .TilesURL }}/glyphs/{fontstack}/{range}.pbf",
   "layers": [
     {
       "id": "background",

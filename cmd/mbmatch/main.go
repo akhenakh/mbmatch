@@ -3,11 +3,11 @@ package main
 import (
 	"fmt"
 	"log"
+	"mime"
 	"net/http"
+	"path/filepath"
 	"strings"
 	"text/template"
-	"mime"
-	"path/filepath"
 
 	"github.com/gobuffalo/packr"
 	"github.com/gorilla/handlers"
@@ -19,9 +19,9 @@ import (
 var (
 	tilesPath       = flag.String("tilesPath", "./hawaii.mbtiles", "mbtiles file path")
 	port            = flag.Int("port", 8000, "port to listen for HTTP")
-	hostname        = flag.String("hostname", fmt.Sprintf("127.0.0.1:%d", *port), "the hostname to come back at tiles")
+	tilesURL        = flag.String("tilesURL", fmt.Sprintf("http://127.0.0.1:%d", *port), "the URL to come back at tiles")
 	debug           = flag.Bool("debug", false, "enable debug")
-	enforceReferrer = flag.Bool("enforceReferrer", false, "enforce referrer check using hostname")
+	enforceReferrer = flag.Bool("enforceReferrer", false, "enforce referrer check using tilesURL")
 
 	pathTpl = []string{"osm-liberty-gl.style", "solarized-dark.style", "planet.json"}
 )
@@ -40,7 +40,7 @@ func addAllowOrigin(h http.Handler) http.Handler {
 }
 func enforceReferrerHandler(h http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		if *enforceReferrer && strings.HasPrefix(r.Referer(), "http://"+*hostname) {
+		if *enforceReferrer && strings.HasPrefix(r.Referer(), *tilesURL) {
 			http.Error(w, http.StatusText(http.StatusUnauthorized), http.StatusUnauthorized)
 			return
 		}
@@ -63,8 +63,8 @@ func (s *server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		log.Fatal(err)
 	}
 
-	p := map[string]interface{}{"Hostname": *hostname}
-	
+	p := map[string]interface{}{"TilesURL": *tilesURL}
+
 	ctype := mime.TypeByExtension(filepath.Ext(path))
 	w.Header().Set("Content-Type", ctype)
 
