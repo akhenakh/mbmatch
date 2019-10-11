@@ -1,5 +1,4 @@
-FROM golang:1.13-alpine as builder
-RUN apk add --no-cache git gcc musl-dev
+FROM golang:1.13-stretch as builder
 COPY . /workdir
 RUN go get github.com/gobuffalo/packr/packr
 RUN cd /workdir/cmd/mbmatch && $GOPATH/bin/packr build

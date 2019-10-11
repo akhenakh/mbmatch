@@ -11,8 +11,8 @@
       "url": "{{ .TilesURL }}/planet.json"
     }
   },
-  "sprite": "http://{{ .TilesURL }}/osm-liberty",
-  "glyphs": "http://{{ .TilesURL }}/glyphs/{fontstack}/{range}.pbf",
+  "sprite": "{{ .TilesURL }}/osm-liberty",
+  "glyphs": "{{ .TilesURL }}/glyphs/{fontstack}/{range}.pbf",
   "layers": [
     {
       "id": "background",
