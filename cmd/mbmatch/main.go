@@ -6,6 +6,8 @@ import (
 	"net/http"
 	"strings"
 	"text/template"
+	"mime"
+	"path/filepath"
 
 	"github.com/gobuffalo/packr"
 	"github.com/gorilla/handlers"
@@ -62,6 +64,9 @@ func (s *server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	}
 
 	p := map[string]interface{}{"Hostname": *hostname}
+	
+	ctype := mime.TypeByExtension(filepath.Ext(path))
+	w.Header().Set("Content-Type", ctype)
 
 	tmplt := template.New("tpl")
 	tmplt, err = tmplt.Parse(sf)
